@@ -16,18 +16,18 @@
 <main>
   <h1>Lab 1 — Hello Cloud</h1>
   <p>Huỳnh Trung Tín · MSSV 2324802010372</p>
-  <p>Bản chuẩn bị. Các mục chờ đo sẽ được cập nhật sau khi thực hành.</p>
+  <p>Thực hành ngày 05/11/2026. Các mốc giờ trong báo cáo dùng múi giờ Việt Nam.</p>
 
   <h2>So sánh môi trường</h2>
-  <p>Giờ bấm tạo Codespace: chờ ghi. Giờ terminal sẵn sàng: chờ ghi.</p>
+  <p>Bấm tạo Codespace lúc 13:49:59. Lần dựng đầu gặp lỗi và vào chế độ khôi phục. Bắt đầu dựng lại lúc 13:55:47 với cấu hình Node.js 22 tối thiểu. API phản hồi thành công lúc 13:58:21, khoảng 8 phút 22 giây kể từ lúc bấm tạo, gồm thời gian xử lý lỗi.</p>
   <table>
     <thead><tr><th scope="col">Tiêu chí</th><th scope="col">Máy cá nhân</th><th scope="col">Codespace</th></tr></thead>
     <tbody>
-      <tr><th scope="row">Từ lúc bắt đầu đến khi chạy được <code>node -v</code></th><td>Chờ đo</td><td>Chờ đo</td></tr>
-      <tr><th scope="row">CPU logic và RAM theo <code>GET /</code></th><td>Chờ đo</td><td>Chờ đo</td></tr>
-      <tr><th scope="row">Hệ điều hành</th><td>Chờ ghi</td><td>Chờ ghi</td></tr>
-      <tr><th scope="row">Truy cập từ thiết bị khác</th><td>Chờ ghi cách thử</td><td>Chờ thử URL cổng 3000 trên điện thoại và chuyển lại Private</td></tr>
-      <tr><th scope="row">Chi phí và đơn vị đo</th><td>Chờ ghi chi phí phần cứng và điện</td><td>Chờ ghi số core-giờ trong Billing Usage</td></tr>
+      <tr><th scope="row">Từ lúc bắt đầu đến khi chạy được <code>node -v</code></th><td>Node.js v24.21.0 đã cài sẵn. Thời gian cài ban đầu chưa được ghi.</td><td>Chạy thành công sau khi dựng lại. Thời điểm chính xác lệnh trả kết quả chưa được ghi.</td></tr>
+      <tr><th scope="row">CPU logic và RAM theo <code>GET /</code></th><td>16 CPU logic, 7,7 GB RAM</td><td>2 CPU logic, 7,8 GB RAM</td></tr>
+      <tr><th scope="row">Hệ điều hành</th><td>Windows_NT 10.0.26300</td><td>Linux 6.8.0-1064-azure</td></tr>
+      <tr><th scope="row">Truy cập từ thiết bị khác</th><td>Có thể dùng IP nội bộ và cổng 3000 trong cùng mạng nếu tường lửa cho phép. Chưa thử trên điện thoại.</td><td>Mở URL HTTPS trên điện thoại qua 5G lúc 14:05:46 khi cổng 3000 ở chế độ Public. Sau đó đã chuyển về Private.</td></tr>
+      <tr><th scope="row">Chi phí và đơn vị đo</th><td>Chi phí phần cứng tính theo giá mua. Điện năng đo bằng kWh. Chưa đo chi phí riêng cho bài thực hành.</td><td>GitHub Billing Usage lọc Codespaces trong tháng 11/2026 báo “No usage found”. Chưa có số liệu core-giờ tại thời điểm kiểm tra.</td></tr>
     </tbody>
   </table>
 
@@ -37,12 +37,12 @@
     <li><strong>Truy cập mạng rộng.</strong> Mở URL HTTPS của API trên điện thoại khi cổng 3000 ở chế độ Public.</li>
     <li><strong>Gộp tài nguyên.</strong> Tạo Codespace trên hạ tầng do GitHub cấp phát và ghi <code>host</code> trước và sau Stop/Start để đối chiếu.</li>
     <li><strong>Co giãn nhanh.</strong> Tạo môi trường khi cần và dừng phiên sau khi làm xong để kết thúc sử dụng tài nguyên tính toán.</li>
-    <li><strong>Dịch vụ đo lường được.</strong> Đọc số core-giờ Codespaces trong Billing Usage.</li>
+    <li><strong>Dịch vụ đo lường được.</strong> Kiểm tra Billing Usage để theo dõi mức sử dụng Codespaces theo core-giờ. Trang chưa hiển thị số liệu khi kiểm tra.</li>
   </ol>
 
   <h2>Câu hỏi phản biện</h2>
   <ol>
-    <li><strong>Giá trị <code>host</code> sau Stop/Start.</strong> Chờ ghi thời điểm và <code>host</code> của hai lần gọi cách nhau một ngày. Đây là tên máy do môi trường chạy báo về. Để kết luận về việc đổi máy vật lý, cần thêm dữ liệu về hạ tầng bên dưới.</li>
+    <li><strong>Giá trị <code>host</code> sau Stop/Start.</strong> Lần đầu lúc 13:58:21 ngày 05/11/2026 ghi nhận <code>codespaces-c2a564</code>. Cần đo lần hai sau khi Stop rồi Start lại vào ngày hôm sau. Đây là tên máy do môi trường chạy báo về. Để kết luận về việc đổi máy vật lý, cần thêm dữ liệu về hạ tầng bên dưới.</li>
     <li><strong>Mô hình dịch vụ.</strong> Có thể lập luận Codespaces gần với PaaS cho phát triển phần mềm. GitHub quản lý hạ tầng và hệ điều hành máy chủ. Người dùng chọn ảnh môi trường, phiên bản runtime và quản lý phụ thuộc cùng mã nguồn.</li>
     <li><strong>So với phòng lab truyền thống.</strong> Một cấu hình dùng chung giảm việc cài lặp lại trên từng máy và giảm chênh lệch phiên bản môi trường. Rủi ro mới là việc thực hành phụ thuộc vào kết nối mạng.</li>
   </ol>
