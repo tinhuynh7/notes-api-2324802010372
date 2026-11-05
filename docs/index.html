@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab 1 — Hello Cloud</title>
+  <style>
+    body { max-width: 56rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.6 system-ui, sans-serif; color: #172238; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: .6rem; border: 1px solid #aab4c4; text-align: left; vertical-align: top; }
+    thead { background: #eef3fa; }
+    li + li { margin-top: .5rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Lab 1 — Hello Cloud</h1>
+  <p>Huỳnh Trung Tín · MSSV 2324802010372</p>
+  <p>Bản chuẩn bị. Các mục chờ đo sẽ được cập nhật sau khi thực hành.</p>
+
+  <h2>So sánh môi trường</h2>
+  <p>Giờ bấm tạo Codespace: chờ ghi. Giờ terminal sẵn sàng: chờ ghi.</p>
+  <table>
+    <thead><tr><th scope="col">Tiêu chí</th><th scope="col">Máy cá nhân</th><th scope="col">Codespace</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Từ lúc bắt đầu đến khi chạy được <code>node -v</code></th><td>Chờ đo</td><td>Chờ đo</td></tr>
+      <tr><th scope="row">CPU logic và RAM theo <code>GET /</code></th><td>Chờ đo</td><td>Chờ đo</td></tr>
+      <tr><th scope="row">Hệ điều hành</th><td>Chờ ghi</td><td>Chờ ghi</td></tr>
+      <tr><th scope="row">Truy cập từ thiết bị khác</th><td>Chờ ghi cách thử</td><td>Chờ thử URL cổng 3000 trên điện thoại và chuyển lại Private</td></tr>
+      <tr><th scope="row">Chi phí và đơn vị đo</th><td>Chờ ghi chi phí phần cứng và điện</td><td>Chờ ghi số core-giờ trong Billing Usage</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Năm đặc tính điện toán đám mây của NIST</h2>
+  <ol>
+    <li><strong>Tự phục vụ theo yêu cầu.</strong> Tự bấm tạo Codespace trên nhánh <code>main</code> và ghi thời gian cấp phát.</li>
+    <li><strong>Truy cập mạng rộng.</strong> Mở URL HTTPS của API trên điện thoại khi cổng 3000 ở chế độ Public.</li>
+    <li><strong>Gộp tài nguyên.</strong> Tạo Codespace trên hạ tầng do GitHub cấp phát và ghi <code>host</code> trước và sau Stop/Start để đối chiếu.</li>
+    <li><strong>Co giãn nhanh.</strong> Tạo môi trường khi cần và dừng phiên sau khi làm xong để kết thúc sử dụng tài nguyên tính toán.</li>
+    <li><strong>Dịch vụ đo lường được.</strong> Đọc số core-giờ Codespaces trong Billing Usage.</li>
+  </ol>
+
+  <h2>Câu hỏi phản biện</h2>
+  <ol>
+    <li><strong>Giá trị <code>host</code> sau Stop/Start.</strong> Chờ ghi thời điểm và <code>host</code> của hai lần gọi cách nhau một ngày. Đây là tên máy do môi trường chạy báo về. Để kết luận về việc đổi máy vật lý, cần thêm dữ liệu về hạ tầng bên dưới.</li>
+    <li><strong>Mô hình dịch vụ.</strong> Có thể lập luận Codespaces gần với PaaS cho phát triển phần mềm. GitHub quản lý hạ tầng và hệ điều hành máy chủ. Người dùng chọn ảnh môi trường, phiên bản runtime và quản lý phụ thuộc cùng mã nguồn.</li>
+    <li><strong>So với phòng lab truyền thống.</strong> Một cấu hình dùng chung giảm việc cài lặp lại trên từng máy và giảm chênh lệch phiên bản môi trường. Rủi ro mới là việc thực hành phụ thuộc vào kết nối mạng.</li>
+  </ol>
+</main>
+</body>
+</html>
