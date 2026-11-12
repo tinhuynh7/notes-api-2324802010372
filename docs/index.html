@@ -3,19 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lab 1 — Hello Cloud</title>
+  <title>Thực hành điện toán đám mây — Lab 1 và Lab 2</title>
   <style>
     body { max-width: 56rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.6 system-ui, sans-serif; color: #172238; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: .6rem; border: 1px solid #aab4c4; text-align: left; vertical-align: top; }
     thead { background: #eef3fa; }
     li + li { margin-top: .5rem; }
+    pre { padding: 1rem; overflow-x: auto; background: #eef3fa; }
+    .table-wrap { overflow-x: auto; }
+    #lab02 { margin-top: 4rem; }
   </style>
 </head>
 <body>
 <main>
   <h1>Lab 1 — Hello Cloud</h1>
   <p>Huỳnh Trung Tín · MSSV 2324802010372</p>
+  <nav aria-label="Bài thực hành"><a href="#lab02">Đến Lab 2 — Docker và CloudSim Plus</a></nav>
   <p>Thực hành ngày 05/11/2026. Các mốc giờ trong báo cáo dùng múi giờ Việt Nam.</p>
 
   <h2>So sánh môi trường</h2>
@@ -46,6 +50,88 @@
     <li><strong>Mô hình dịch vụ.</strong> Có thể lập luận Codespaces gần với PaaS cho phát triển phần mềm. GitHub quản lý hạ tầng và hệ điều hành máy chủ. Người dùng chọn ảnh môi trường, phiên bản runtime và quản lý phụ thuộc cùng mã nguồn.</li>
     <li><strong>So với phòng lab truyền thống.</strong> Một cấu hình dùng chung giảm việc cài lặp lại trên từng máy và giảm chênh lệch phiên bản môi trường. Rủi ro mới là việc thực hành phụ thuộc vào kết nối mạng.</li>
   </ol>
+  <section id="lab02" aria-labelledby="lab02-title">
+    <h2 id="lab02-title">Lab 2 — Ảo hóa, container và mô phỏng trung tâm dữ liệu</h2>
+    <p>Thực hành ngày 12/11/2026. Đóng gói API Node.js bằng Docker, phân phối image qua GHCR và thử nghiệm số VM, số tác vụ, bộ lập lịch bằng CloudSim Plus.</p>
+
+    <h3>Image công khai trên GHCR và mã nguồn</h3>
+    <ul>
+      <li><a href="https://github.com/users/tinhuynh7/packages/container/notes-api">Package notes-api trên GHCR</a> — image <code>ghcr.io/tinhuynh7/notes-api:1.0</code>.</li>
+      <li><a href="https://github.com/tinhuynh7/notes-api-2324802010372/blob/main/Dockerfile">Dockerfile trong kho mã nguồn</a>.</li>
+      <li><a href="https://github.com/tinhuynh7/notes-api-2324802010372">Kho mã nguồn notes-api-2324802010372</a>.</li>
+    </ul>
+    <p>Đã đăng xuất GHCR, xóa image cục bộ rồi kéo lại image công khai thành công. Container chạy từ image kéo về trả JSON với thông điệp “Xin chào từ đám mây!”.</p>
+    <pre><code>docker pull ghcr.io/tinhuynh7/notes-api:1.0
+docker run -d --name notes1 -p 3000:3000 ghcr.io/tinhuynh7/notes-api:1.0
+curl -s localhost:3000</code></pre>
+
+    <h3>Dockerfile</h3>
+    <pre><code>FROM node:22-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY src ./src
+ENV PORT=3000
+EXPOSE 3000
+USER node
+CMD ["node", "src/server.js"]</code></pre>
+    <p><code>.dockerignore</code> loại <code>node_modules</code>, <code>.env</code>, <code>.git</code> và <code>docs</code> khỏi ngữ cảnh build. Image chỉ cài phụ thuộc chạy ứng dụng và chạy bằng tài khoản <code>node</code>.</p>
+
+    <h3>Bảng 1 — So sánh Codespace và container</h3>
+    <div class="table-wrap">
+      <table>
+        <caption>Số liệu quan sát trong bài thực hành</caption>
+        <thead><tr><th scope="col">Tiêu chí</th><th scope="col">Codespace</th><th scope="col">Container Docker</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Thời gian khởi động</th><td>Khoảng 1 phút 55 giây đến khi terminal sẵn sàng, theo lượt đo Lab 1.</td><td>0,450 giây từ dòng <code>real</code> của <code>time docker run --rm notes-api:1.0 node -e "1"</code>.</td></tr>
+          <tr><th scope="row">Kích thước hoặc hạn mức lưu trữ</th><td>15 GB-tháng là hạn mức theo đề, không phải kích thước image hay dung lượng thực tế đã dùng.</td><td><code>DISK USAGE</code>: 251 MB; <code>CONTENT SIZE</code>: 63,3 MB theo <code>docker images notes-api</code>.</td></tr>
+          <tr><th scope="row">Nhân hệ điều hành</th><td><code>6.8.0-1070-azure</code> theo <code>uname -r</code>.</td><td><code>notes1</code> và <code>notes2</code> cùng trả <code>6.8.0-1070-azure</code>; dùng chung nhân với máy chủ Docker.</td></tr>
+          <tr><th scope="row">Mức cô lập</th><td>Môi trường phát triển chạy trong container trên hạ tầng VM của Codespaces; VM là lớp cô lập bên dưới.</td><td>Cô lập tiến trình và giới hạn tài nguyên bằng namespaces/cgroups; không có nhân riêng.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Hai phép đo thời gian có phạm vi khác nhau: Codespace gồm cấp phát môi trường và thao tác xác nhận; lệnh Docker chỉ tạo container từ image đã có, chạy Node rồi thoát. Vì vậy, số liệu minh họa chi phí khởi tạo của hai quy trình, không phải phép đo tốc độ tương đương.</p>
+    <p><code>notes2</code> được giới hạn <code>--cpus=0.5 --memory=128m</code>. <code>docker stats --no-stream</code> ghi nhận khoảng <strong>13,09 MiB / 128 MiB</strong>; <code>docker inspect</code> xác nhận <code>NanoCpus=500000000</code> và <code>Memory=134217728</code> byte. Hai API đều trả JSON; trường <code>memoryGB</code> vẫn khoảng 7,8 GB.</p>
+
+    <h3>Bảng 2 — Thí nghiệm CloudSim Plus</h3>
+    <p>Cấu hình gốc: 1 host có 8 lõi, 2 VM có 4 lõi/VM, 4 cloudlet có 2 lõi/cloudlet, chiều dài 10.000 MI và mức sử dụng CPU 50%. Giá trị ghi dưới đây là <code>FinishTime</code> lớn nhất trong bảng cloudlet, không phải thời điểm tắt mô phỏng.</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Kết quả bốn lần chạy trên Codespace</caption>
+        <thead><tr><th scope="col">Lần</th><th scope="col">Thay đổi</th><th scope="col">FinishTime cuối</th><th scope="col">Kết quả và ghi chú</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">0</th><td>Giữ nguyên cấu hình gốc.</td><td>20,1 giây</td><td>4/4 cloudlet SUCCESS.</td></tr>
+          <tr><th scope="row">1</th><td>Nhân đôi <code>VMS</code>: 2 → 4.</td><td>45,6 giây</td><td>4/4 cloudlet SUCCESS. Host 8 lõi không đủ cấp cho 4 VM × 4 lõi. VM 2 và 3 không đặt được; các lần thử lại làm cloudlet bắt đầu ở 25,6 giây.</td></tr>
+          <tr><th scope="row">2</th><td>Nhân đôi <code>CLOUDLETS</code>: 4 → 8; bản chạy sau khắc phục đặt nhu cầu RAM/BW mỗi cloudlet ở 25%.</td><td>40,1 giây</td><td>8/8 cloudlet SUCCESS sau khắc phục; CPU vẫn 50%, VMS vẫn 2. Mô phỏng tắt ở 40,22 giây.</td></tr>
+          <tr><th scope="row">3</th><td>Giữ 2 VM, 4 cloudlet; dùng <code>CloudletSchedulerSpaceShared</code>.</td><td>20,1 giây</td><td>4/4 cloudlet SUCCESS.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Ghi chú về lần 2:</strong> với mô hình gốc, mỗi cloudlet yêu cầu 50% RAM và băng thông của VM. Bốn cloudlet trên một VM có tổng nhu cầu 200%. Lượt chạy ban đầu chỉ có 4/8 cloudlet hoàn thành lúc 40,1 giây và cảnh báo VM bị hủy khi còn tác vụ. Sau khi đặt riêng mức sử dụng RAM và băng thông ở 25%, giữ CPU ở 50%, cả 8 cloudlet hoàn thành.</p>
+    <pre><code>cloudlet.setUtilizationModelRam(new UtilizationModelDynamic(0.25));
+cloudlet.setUtilizationModelBw(new UtilizationModelDynamic(0.25));</code></pre>
+    <p>Lần 2 sau khắc phục có thêm thay đổi mô hình tài nguyên so với bản gốc, nên bảng trên chưa phải phép so sánh hoàn toàn một yếu tố. Kiểm chứng bổ sung trên máy cá nhân với RAM/BW 25% dùng chung cho cả bốn lần cho thời gian 20,1; 45,6; 40,1; 20,1 giây. Các lần 0, 1 và 3 chưa được chạy lại trên Codespace với cấu hình chung này.</p>
+
+    <h3>Câu hỏi phản biện</h3>
+    <h4>1. Vì sao notes2 vẫn báo RAM máy chủ dù giới hạn 128 MiB?</h4>
+    <p>API tính <code>memoryGB</code> bằng <code>os.totalmem()</code>. Trong môi trường thực nghiệm, giá trị này phản ánh tổng RAM hệ thống khoảng 7,8 GB, còn giới hạn 128 MiB được Docker thực thi bằng cgroup. Giá trị hiển thị của API không phải ngân sách bộ nhớ mà container được phép dùng.</p>
+    <p>Ứng dụng Java hoặc Node.js cần dùng runtime nhận biết giới hạn container và kiểm tra ngân sách bộ nhớ thực tế; không tính heap hoặc cache chỉ dựa trên RAM máy chủ. Nếu cấu hình heap bằng <code>-Xmx</code> của Java hoặc <code>--max-old-space-size</code> của Node.js, phải chừa phần bộ nhớ cho luồng, thư viện native, buffer và các vùng ngoài heap. Vượt giới hạn có thể khiến tiến trình bị OOM-kill. Với Node.js có thể kiểm tra <code>process.constrainedMemory()</code> và theo dõi <code>process.memoryUsage()</code>.</p>
+
+    <h4>2. Time-shared và space-shared khác nhau ra sao? Gói giá rẻ nên dùng chính sách nào?</h4>
+    <p>Time-shared chia sẻ năng lực CPU giữa các cloudlet đang chạy. Space-shared chỉ cho cloudlet bắt đầu khi có đủ lõi, các cloudlet khác chờ đến khi lõi được giải phóng. Trong lần 3, mỗi VM có 4 lõi và nhận 2 cloudlet × 2 lõi nên đủ chạy đồng thời. Vì vậy, cả TimeShared ở lần 0 và SpaceShared ở lần 3 đều có FinishTime 20,1 giây.</p>
+    <p>Với gói giá rẻ, nhà cung cấp có thể chọn CPU chia sẻ theo thời gian để phục vụ nhiều khách hàng trên cùng hạ tầng, tăng mức tận dụng và giảm chi phí trên mỗi khách hàng. Đổi lại, hiệu năng có thể dao động khi có tranh chấp CPU; cần hạn mức và cơ chế chia sẻ công bằng. Đây là lập luận về chính sách cung cấp dịch vụ. Bộ lập lịch cloudlet trong thí nghiệm chỉ minh họa nguyên lý, không trực tiếp đo chính sách chia sẻ CPU giữa các khách hàng.</p>
+
+    <h4>3. Mô phỏng giúp ích gì trước khi thuê hạ tầng thật? Sai lệch có thể đến từ đâu?</h4>
+    <p>Mô phỏng giúp thử số host, số VM, khối lượng tác vụ và bộ lập lịch trước khi trả tiền thuê hạ tầng. Có thể phát hiện cấu hình thiếu tài nguyên, so sánh phương án và ước lượng thời gian xử lý để chọn phương án thử nghiệm thực tế.</p>
+    <p>Kết quả phụ thuộc vào mô hình và tham số đầu vào. CPU thực tế, cache, tốc độ mạng, I/O ổ đĩa, thời gian khởi động, thu gom rác, tải từ người dùng khác và cơ chế giới hạn tài nguyên có thể khác giả định. Lỗi hoặc cấu hình của bộ mô phỏng cũng có thể ảnh hưởng kết quả, như lượt chạy 8 cloudlet ban đầu. Cần kiểm chứng bằng tải đại diện trên hạ tầng thật trước khi quyết định triển khai.</p>
+
+    <h3>Tài liệu tham khảo</h3>
+    <ul>
+      <li><a href="https://nodejs.org/docs/latest-v22.x/api/os.html#ostotalmem">Node.js — os.totalmem()</a> và <a href="https://nodejs.org/docs/latest-v22.x/api/process.html#processconstrainedmemory">process.constrainedMemory()</a>.</li>
+      <li><a href="https://docs.docker.com/engine/containers/resource_constraints/">Docker — giới hạn tài nguyên container</a>.</li>
+      <li><a href="https://github.com/cloudsimplus/cloudsimplus-examples/blob/master/src/main/java/org/cloudsimplus/examples/BasicFirstExample.java">CloudSim Plus — BasicFirstExample</a> và <a href="https://github.com/cloudsimplus/cloudsimplus/blob/master/docs/FAQ.rst">FAQ về lập lịch</a>.</li>
+    </ul>
+  </section>
 </main>
 </body>
 </html>
