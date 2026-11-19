@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Thực hành điện toán đám mây — Lab 1 và Lab 2</title>
+  <title>Thực hành điện toán đám mây — Lab 1 Lab 2 và Lab 3</title>
   <style>
     body { max-width: 56rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.6 system-ui, sans-serif; color: #172238; }
     table { width: 100%; border-collapse: collapse; }
@@ -12,14 +12,16 @@
     li + li { margin-top: .5rem; }
     pre { padding: 1rem; overflow-x: auto; background: #eef3fa; }
     .table-wrap { overflow-x: auto; }
-    #lab02 { margin-top: 4rem; }
+    #lab02, #lab03 { margin-top: 4rem; }
+    figure { margin: 1.5rem 0; }
+    figure img { max-width: 100%; height: auto; max-height: 55rem; object-fit: contain; }
   </style>
 </head>
 <body>
 <main>
   <h1>Lab 1 — Hello Cloud</h1>
   <p>Huỳnh Trung Tín · MSSV 2324802010372</p>
-  <nav aria-label="Bài thực hành"><a href="#lab02">Đến Lab 2 — Docker và CloudSim Plus</a></nav>
+  <nav aria-label="Bài thực hành"><a href="#lab02">Đến Lab 2 — Docker và CloudSim Plus</a> · <a href="#lab03">Đến Lab 3 — NoSQL và lưu trữ đối tượng</a></nav>
   <p>Thực hành ngày 05/11/2026. Các mốc giờ trong báo cáo dùng múi giờ Việt Nam.</p>
 
   <h2>So sánh môi trường</h2>
@@ -132,6 +134,61 @@ cloudlet.setUtilizationModelBw(new UtilizationModelDynamic(0.25));</code></pre>
       <li><a href="https://github.com/cloudsimplus/cloudsimplus-examples/blob/master/src/main/java/org/cloudsimplus/examples/BasicFirstExample.java">CloudSim Plus — BasicFirstExample</a> và <a href="https://github.com/cloudsimplus/cloudsimplus/blob/master/docs/FAQ.rst">FAQ về lập lịch</a>.</li>
     </ul>
   </section>
+<section id="lab03" aria-labelledby="lab03-title">
+<h2 id="lab03-title">Lab 3 — Lưu trữ phân tán NoSQL và lưu trữ đối tượng</h2>
+<p>Huỳnh Trung Tín · MSSV 2324802010372 · Thực hành ngày 19/11/2026.</p>
+<p><a href="Lab03_NoSQL_2324802010372.docx">Tải báo cáo Word Lab03</a></p>
+<p>Báo cáo tổng hợp mã nguồn, số liệu và minh chứng thực hành MongoDB Atlas cùng Supabase Storage. Chỉ mục tags giảm số tài liệu cần kiểm tra từ 2.000 xuống 571, tương đương 3,50 lần; CRUD và tải tệp đã được kiểm tra theo các tình huống của đề.</p>
+<h3>1 Hệ thống và sản phẩm thực hành</h3>
+<p>API Node.js và Express 5 tiếp tục repo bài 2, giữ GET / và thêm /notes. MongoDB Atlas sử dụng Cluster0, gói Free, AWS Singapore, replica set 3 nút. User notes_app có quyền readWrite trên database notes. Network Access mở 0.0.0.0/0 theo yêu cầu lab.</p>
+<p>Supabase project cloud-lab đặt tại Singapore; bucket attachments ở chế độ Public. API giới hạn tệp 2 MB và lưu attachmentUrl trong MongoDB. Các biến kết nối được lưu trong .env, tệp này được Git bỏ qua.</p>
+<p><a href="https://github.com/tinhuynh7/notes-api-2324802010372">Kho mã nguồn notes-api-2324802010372</a></p>
+<p><a href="https://tinhuynh7.github.io/notes-api-2324802010372/#lab03">Báo cáo HTML Lab03 trên GitHub Pages</a></p>
+<p><a href="https://github.com/tinhuynh7/notes-api-2324802010372/blob/main/docs/index.html#lab03">Mã HTML báo cáo trong GitHub</a></p>
+<p><a href="https://github.com/tinhuynh7/notes-api-2324802010372/commit/9f49d5ad94980cdfd69c5169bac6dacf804ee70a">Commit Bai 3 trên GitHub 9f49d5a</a></p>
+<h3>2 Kết quả đo hiệu quả chỉ mục</h3>
+<table><caption>Kết quả explain.js</caption><thead><tr><th scope="col">Cách truy vấn</th><th scope="col">docsExamined</th><th scope="col">returned</th><th scope="col">ms</th></tr></thead><tbody><tr><th scope="row">Quét toàn bộ</th><td>2.000</td><td>571</td><td>2</td></tr><tr><th scope="row">Dùng chỉ mục</th><td>571</td><td>571</td><td>1</td></tr></tbody></table>
+<p>Chạy node scripts/seed.js để tạo 2.000 ghi chú, sau đó node scripts/explain.js. Hai truy vấn có cùng điều kiện tags = docker; một truy vấn ép quét toàn bộ bằng $natural, truy vấn còn lại ép dùng chỉ mục tags.</p>
+<p>Tỉ số giảm quét = 2.000 / 571 ≈ 3,50 lần. Số tài liệu kiểm tra giảm 1.429, tương đương 71,45%. Hai cách đều trả 571 kết quả. Thời gian 2 ms và 1 ms thuộc lần đo minh chứng, không bảo đảm luôn nhanh gấp hai lần.</p>
+<h3>3 Kết quả CRUD và lưu trữ tệp</h3>
+<p>Ghi chú có tệp đính kèm được giữ lại để kiểm tra; thao tác xóa được thực hiện trên ghi chú riêng. Ảnh trình duyệt xác nhận tệp public hiển thị đúng nội dung.</p>
+<p><a href="https://abljbqudctqgrqodrcve.supabase.co/storage/v1/object/public/attachments/6afea52c72b25219a0b1e547/1795073432972-note.txt">Mở tệp note.txt minh chứng trên Supabase</a></p>
+<p>Đối chiếu điểm kiểm tra: đủ năm thao tác tạo, danh sách, chi tiết, cập nhật, xóa; mã 201/204/404/400 đúng tình huống; mở được tệp qua attachmentUrl; có bảng số liệu hai cách truy vấn; git status không liệt kê .env.</p>
+<p>API được kiểm tra tại localhost. Địa chỉ localhost không phải URL API công khai dành cho người chấm. Những kết quả trên được ghi nhận tại thời điểm thực nghiệm.</p>
+<h3>4 So sánh nhân bản Atlas và HDFS</h3>
+<p>Ảnh Atlas xác nhận cụm ở Singapore và Replica Set 3 nodes. Mô hình bài lab gồm một primary và hai secondary; ảnh tổng quan không hiển thị vai trò riêng của từng nút.</p>
+<p>Giống nhau: duy trì nhiều bản sao để chịu lỗi máy và tăng tính sẵn sàng. Khác nhau: primary lưu dữ liệu ứng dụng, còn NameNode quản lý metadata và vị trí khối. Primary không tương đương NameNode. Nhân bản không thay thế sao lưu vì thao tác xóa nhầm có thể được phản ánh trên các bản sao.</p>
+<h3>5 Câu hỏi phản biện</h3>
+<h4>1 Khi dữ liệu tăng lên 2 triệu tài liệu</h4>
+<p>Giữ nguyên phân bố tag, số tài liệu tăng 1.000 lần: quét toàn bộ cần kiểm tra khoảng 2.000.000 tài liệu; dùng chỉ mục khoảng 571.000 tài liệu, vẫn giảm khoảng 3,50 lần. Đây là ước lượng theo dữ liệu đã đo, không phải phép đo thật ở quy mô 2 triệu.</p>
+<p>Thời gian còn phụ thuộc cache, I/O, tải hệ thống, truy cập chỉ mục và truyền kết quả. Giới hạn 100 thao tác/giây trong giả thiết đề không phải 100 tài liệu quét/giây; không thể lấy 2 triệu chia 100 để tính thời gian truy vấn. Khi tải tăng, quét nhiều dữ liệu làm tăng công việc mỗi truy vấn và có thể tăng độ trễ.</p>
+<h4>2 Vì sao lưu tệp ở Supabase và URL trong MongoDB</h4>
+<p>Object Storage phù hợp lưu và phân phối tệp qua HTTP. MongoDB giữ metadata và URL nên tài liệu gọn, không phải truyền nội dung tệp khi lấy danh sách ghi chú; đồng thời giảm dữ liệu tệp phải lưu và nhân bản trong database.</p>
+<p>Cần quản lý tính nhất quán giữa hai dịch vụ: upload thành công nhưng lưu ghi chú thất bại có thể để lại tệp không được tham chiếu. Mã lab chưa tự xóa tệp cũ khi thay attachment hoặc xóa ghi chú. Bucket public chỉ phù hợp tệp không nhạy cảm.</p>
+<h4>3 Mục tiêu của ba bản sao và đơn vị nhân bản</h4>
+<p>Mục tiêu chung là giữ dữ liệu ở nhiều nơi để chịu lỗi máy. Replica set ba thành viên bỏ phiếu có thể duy trì đa số khi một thành viên hỏng, nếu điều kiện kết nối và bầu chọn phù hợp; primary mới có thể được bầu từ secondary.</p>
+<p>Atlas nhân bản dữ liệu giữa các thành viên replica set. HDFS mặc định lưu ba bản sao mỗi khối tệp trên DataNode; NameNode không phải một trong ba bản sao khối. Khả năng phục vụ HDFS còn phụ thuộc NameNode và cấu hình HA. Ba DataNode trong sơ đồ chỉ minh họa một khối có ba bản sao.</p>
+<h3>Sơ đồ so sánh Atlas và HDFS</h3>
+<h3>Ảnh minh chứng thực nghiệm</h3>
+<h3>Minh chứng bổ sung MongoDB Atlas</h3>
+<h3>Minh chứng bổ sung Supabase</h3>
+<h3>Bảng kiểm tra CRUD và upload</h3><table><thead><tr><th scope="col">Thao tác hoặc tình huống</th><th scope="col">Kết quả</th><th scope="col">Minh chứng</th></tr></thead><tbody><tr><td>POST /notes</td><td>201, trả ghi chú có _id</td><td>Hình 5</td></tr><tr><td>GET /notes?tag=nosql</td><td>200, danh sách đã lọc</td><td>Hình 6</td></tr><tr><td>GET /notes/:id</td><td>200, đúng ghi chú</td><td>Hình 7</td></tr><tr><td>PUT /notes/:id</td><td>200, tiêu đề đã cập nhật</td><td>Hình 8</td></tr><tr><td>POST /notes/:id/attachment</td><td>Có attachmentUrl</td><td>Hình 9</td></tr><tr><td>Mở attachmentUrl</td><td>Đúng nội dung tệp</td><td>Hình 10</td></tr><tr><td>DELETE /notes/:id</td><td>204</td><td>Hình 11</td></tr><tr><td>GET lại ghi chú đã xóa</td><td>404</td><td>Hình 12</td></tr><tr><td>POST /notes với JSON {}</td><td>400, thiếu title</td><td>Hình 13</td></tr><tr><td>git check-ignore và git status</td><td>Bỏ qua .env</td><td>Hình 4</td></tr></tbody></table><h3>Bảng so sánh Atlas và HDFS</h3><table><thead><tr><th scope="col">Nội dung</th><th scope="col">MongoDB Atlas</th><th scope="col">HDFS</th></tr></thead><tbody><tr><td>Đơn vị nhân bản</td><td>Dữ liệu giữa các thành viên replica set</td><td>Từng khối tệp giữa các DataNode</td></tr><tr><td>Vai trò chính</td><td>Primary nhận ghi; secondary sao chép thay đổi</td><td>NameNode quản lý metadata; DataNode giữ khối</td></tr><tr><td>Ý nghĩa số 3</td><td>Ba thành viên của replica set</td><td>Ba bản sao mỗi khối; có thể nhiều hơn ba DataNode</td></tr><tr><td>Luồng ghi minh họa</td><td>Ứng dụng ghi primary, thay đổi được nhân bản</td><td>Client hỏi NameNode rồi ghi qua pipeline DataNode</td></tr></tbody></table><h3>Ảnh minh chứng Lab03</h3>
+<figure><a href="minh-chung/01-explain.png"><img loading="lazy" src="minh-chung/01-explain.png" alt="Minh chứng 01-explain"></a><figcaption>01-explain</figcaption></figure>
+<figure><a href="minh-chung/02-atlas.png"><img loading="lazy" src="minh-chung/02-atlas.png" alt="Minh chứng 02-atlas"></a><figcaption>02-atlas</figcaption></figure>
+<figure><a href="minh-chung/03-atlas-hdfs.png"><img loading="lazy" src="minh-chung/03-atlas-hdfs.png" alt="Minh chứng 03-atlas-hdfs"></a><figcaption>03-atlas-hdfs</figcaption></figure>
+<figure><a href="minh-chung/04-git-ignore.png"><img loading="lazy" src="minh-chung/04-git-ignore.png" alt="Minh chứng 04-git-ignore"></a><figcaption>04-git-ignore</figcaption></figure>
+<figure><a href="minh-chung/05-create-201.png"><img loading="lazy" src="minh-chung/05-create-201.png" alt="Minh chứng 05-create-201"></a><figcaption>05-create-201</figcaption></figure>
+<figure><a href="minh-chung/06-list-200.png"><img loading="lazy" src="minh-chung/06-list-200.png" alt="Minh chứng 06-list-200"></a><figcaption>06-list-200</figcaption></figure>
+<figure><a href="minh-chung/07-read-200.png"><img loading="lazy" src="minh-chung/07-read-200.png" alt="Minh chứng 07-read-200"></a><figcaption>07-read-200</figcaption></figure>
+<figure><a href="minh-chung/08-update-200.png"><img loading="lazy" src="minh-chung/08-update-200.png" alt="Minh chứng 08-update-200"></a><figcaption>08-update-200</figcaption></figure>
+<figure><a href="minh-chung/09-upload-url.png"><img loading="lazy" src="minh-chung/09-upload-url.png" alt="Minh chứng 09-upload-url"></a><figcaption>09-upload-url</figcaption></figure>
+<figure><a href="minh-chung/10-public-file.png"><img loading="lazy" src="minh-chung/10-public-file.png" alt="Minh chứng 10-public-file"></a><figcaption>10-public-file</figcaption></figure>
+<figure><a href="minh-chung/11-delete-204.png"><img loading="lazy" src="minh-chung/11-delete-204.png" alt="Minh chứng 11-delete-204"></a><figcaption>11-delete-204</figcaption></figure>
+<figure><a href="minh-chung/12-not-found-404.png"><img loading="lazy" src="minh-chung/12-not-found-404.png" alt="Minh chứng 12-not-found-404"></a><figcaption>12-not-found-404</figcaption></figure>
+<figure><a href="minh-chung/13-invalid-400.png"><img loading="lazy" src="minh-chung/13-invalid-400.png" alt="Minh chứng 13-invalid-400"></a><figcaption>13-invalid-400</figcaption></figure>
+<figure><a href="minh-chung/14-atlas-overview.png"><img loading="lazy" src="minh-chung/14-atlas-overview.png" alt="Minh chứng 14-atlas-overview"></a><figcaption>14-atlas-overview</figcaption></figure>
+<figure><a href="minh-chung/15-supabase-overview.png"><img loading="lazy" src="minh-chung/15-supabase-overview.png" alt="Minh chứng 15-supabase-overview"></a><figcaption>15-supabase-overview</figcaption></figure>
+</section>
 </main>
 </body>
 </html>
