@@ -21,7 +21,7 @@
 <main>
   <h1>Lab 1 — Hello Cloud</h1>
   <p>Huỳnh Trung Tín · MSSV 2324802010372</p>
-  <nav aria-label="Bài thực hành"><a href="#lab02">Đến Lab 2 — Docker và CloudSim Plus</a> · <a href="#lab03">Đến Lab 3 — NoSQL và lưu trữ đối tượng</a></nav>
+  <nav aria-label="Bài thực hành"><a href="#lab02">Đến Lab 2 — Docker và CloudSim Plus</a> · <a href="#lab03">Đến Lab 3 — NoSQL và lưu trữ đối tượng</a> · <a href="#lab04">Đến Lab 4 — Bảo mật ứng dụng đám mây</a></nav>
   <p>Thực hành ngày 05/11/2026. Các mốc giờ trong báo cáo dùng múi giờ Việt Nam.</p>
 
   <h2>So sánh môi trường</h2>
@@ -137,7 +137,7 @@ cloudlet.setUtilizationModelBw(new UtilizationModelDynamic(0.25));</code></pre>
 <section id="lab03" aria-labelledby="lab03-title">
 <h2 id="lab03-title">Lab 3 — Lưu trữ phân tán NoSQL và lưu trữ đối tượng</h2>
 <p>Huỳnh Trung Tín · MSSV 2324802010372 · Thực hành ngày 19/11/2026.</p>
-<p><a href="Lab03_NoSQL_2324802010372.docx">Tải báo cáo Word Lab03</a></p>
+<p><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/Lab03_NoSQL_2324802010372.docx">Tải báo cáo Word Lab03</a></p>
 <p>Báo cáo tổng hợp mã nguồn, số liệu và minh chứng thực hành MongoDB Atlas cùng Supabase Storage. Chỉ mục tags giảm số tài liệu cần kiểm tra từ 2.000 xuống 571, tương đương 3,50 lần; CRUD và tải tệp đã được kiểm tra theo các tình huống của đề.</p>
 <h3>1 Hệ thống và sản phẩm thực hành</h3>
 <p>API Node.js và Express 5 tiếp tục repo bài 2, giữ GET / và thêm /notes. MongoDB Atlas sử dụng Cluster0, gói Free, AWS Singapore, replica set 3 nút. User notes_app có quyền readWrite trên database notes. Network Access mở 0.0.0.0/0 theo yêu cầu lab.</p>
@@ -168,26 +168,41 @@ cloudlet.setUtilizationModelBw(new UtilizationModelDynamic(0.25));</code></pre>
 <h4>3 Mục tiêu của ba bản sao và đơn vị nhân bản</h4>
 <p>Mục tiêu chung là giữ dữ liệu ở nhiều nơi để chịu lỗi máy. Replica set ba thành viên bỏ phiếu có thể duy trì đa số khi một thành viên hỏng, nếu điều kiện kết nối và bầu chọn phù hợp; primary mới có thể được bầu từ secondary.</p>
 <p>Atlas nhân bản dữ liệu giữa các thành viên replica set. HDFS mặc định lưu ba bản sao mỗi khối tệp trên DataNode; NameNode không phải một trong ba bản sao khối. Khả năng phục vụ HDFS còn phụ thuộc NameNode và cấu hình HA. Ba DataNode trong sơ đồ chỉ minh họa một khối có ba bản sao.</p>
-<h3>Sơ đồ so sánh Atlas và HDFS</h3>
-<h3>Ảnh minh chứng thực nghiệm</h3>
-<h3>Minh chứng bổ sung MongoDB Atlas</h3>
-<h3>Minh chứng bổ sung Supabase</h3>
 <h3>Bảng kiểm tra CRUD và upload</h3><table><thead><tr><th scope="col">Thao tác hoặc tình huống</th><th scope="col">Kết quả</th><th scope="col">Minh chứng</th></tr></thead><tbody><tr><td>POST /notes</td><td>201, trả ghi chú có _id</td><td>Hình 5</td></tr><tr><td>GET /notes?tag=nosql</td><td>200, danh sách đã lọc</td><td>Hình 6</td></tr><tr><td>GET /notes/:id</td><td>200, đúng ghi chú</td><td>Hình 7</td></tr><tr><td>PUT /notes/:id</td><td>200, tiêu đề đã cập nhật</td><td>Hình 8</td></tr><tr><td>POST /notes/:id/attachment</td><td>Có attachmentUrl</td><td>Hình 9</td></tr><tr><td>Mở attachmentUrl</td><td>Đúng nội dung tệp</td><td>Hình 10</td></tr><tr><td>DELETE /notes/:id</td><td>204</td><td>Hình 11</td></tr><tr><td>GET lại ghi chú đã xóa</td><td>404</td><td>Hình 12</td></tr><tr><td>POST /notes với JSON {}</td><td>400, thiếu title</td><td>Hình 13</td></tr><tr><td>git check-ignore và git status</td><td>Bỏ qua .env</td><td>Hình 4</td></tr></tbody></table><h3>Bảng so sánh Atlas và HDFS</h3><table><thead><tr><th scope="col">Nội dung</th><th scope="col">MongoDB Atlas</th><th scope="col">HDFS</th></tr></thead><tbody><tr><td>Đơn vị nhân bản</td><td>Dữ liệu giữa các thành viên replica set</td><td>Từng khối tệp giữa các DataNode</td></tr><tr><td>Vai trò chính</td><td>Primary nhận ghi; secondary sao chép thay đổi</td><td>NameNode quản lý metadata; DataNode giữ khối</td></tr><tr><td>Ý nghĩa số 3</td><td>Ba thành viên của replica set</td><td>Ba bản sao mỗi khối; có thể nhiều hơn ba DataNode</td></tr><tr><td>Luồng ghi minh họa</td><td>Ứng dụng ghi primary, thay đổi được nhân bản</td><td>Client hỏi NameNode rồi ghi qua pipeline DataNode</td></tr></tbody></table><h3>Ảnh minh chứng Lab03</h3>
-<figure><a href="minh-chung/01-explain.png"><img loading="lazy" src="minh-chung/01-explain.png" alt="Minh chứng 01-explain"></a><figcaption>01-explain</figcaption></figure>
-<figure><a href="minh-chung/02-atlas.png"><img loading="lazy" src="minh-chung/02-atlas.png" alt="Minh chứng 02-atlas"></a><figcaption>02-atlas</figcaption></figure>
-<figure><a href="minh-chung/03-atlas-hdfs.png"><img loading="lazy" src="minh-chung/03-atlas-hdfs.png" alt="Minh chứng 03-atlas-hdfs"></a><figcaption>03-atlas-hdfs</figcaption></figure>
-<figure><a href="minh-chung/04-git-ignore.png"><img loading="lazy" src="minh-chung/04-git-ignore.png" alt="Minh chứng 04-git-ignore"></a><figcaption>04-git-ignore</figcaption></figure>
-<figure><a href="minh-chung/05-create-201.png"><img loading="lazy" src="minh-chung/05-create-201.png" alt="Minh chứng 05-create-201"></a><figcaption>05-create-201</figcaption></figure>
-<figure><a href="minh-chung/06-list-200.png"><img loading="lazy" src="minh-chung/06-list-200.png" alt="Minh chứng 06-list-200"></a><figcaption>06-list-200</figcaption></figure>
-<figure><a href="minh-chung/07-read-200.png"><img loading="lazy" src="minh-chung/07-read-200.png" alt="Minh chứng 07-read-200"></a><figcaption>07-read-200</figcaption></figure>
-<figure><a href="minh-chung/08-update-200.png"><img loading="lazy" src="minh-chung/08-update-200.png" alt="Minh chứng 08-update-200"></a><figcaption>08-update-200</figcaption></figure>
-<figure><a href="minh-chung/09-upload-url.png"><img loading="lazy" src="minh-chung/09-upload-url.png" alt="Minh chứng 09-upload-url"></a><figcaption>09-upload-url</figcaption></figure>
-<figure><a href="minh-chung/10-public-file.png"><img loading="lazy" src="minh-chung/10-public-file.png" alt="Minh chứng 10-public-file"></a><figcaption>10-public-file</figcaption></figure>
-<figure><a href="minh-chung/11-delete-204.png"><img loading="lazy" src="minh-chung/11-delete-204.png" alt="Minh chứng 11-delete-204"></a><figcaption>11-delete-204</figcaption></figure>
-<figure><a href="minh-chung/12-not-found-404.png"><img loading="lazy" src="minh-chung/12-not-found-404.png" alt="Minh chứng 12-not-found-404"></a><figcaption>12-not-found-404</figcaption></figure>
-<figure><a href="minh-chung/13-invalid-400.png"><img loading="lazy" src="minh-chung/13-invalid-400.png" alt="Minh chứng 13-invalid-400"></a><figcaption>13-invalid-400</figcaption></figure>
-<figure><a href="minh-chung/14-atlas-overview.png"><img loading="lazy" src="minh-chung/14-atlas-overview.png" alt="Minh chứng 14-atlas-overview"></a><figcaption>14-atlas-overview</figcaption></figure>
-<figure><a href="minh-chung/15-supabase-overview.png"><img loading="lazy" src="minh-chung/15-supabase-overview.png" alt="Minh chứng 15-supabase-overview"></a><figcaption>15-supabase-overview</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/01-explain.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/01-explain.png" alt="Minh chứng 01-explain"></a><figcaption>01-explain</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/02-atlas.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/02-atlas.png" alt="Minh chứng 02-atlas"></a><figcaption>02-atlas</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/03-atlas-hdfs.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/03-atlas-hdfs.png" alt="Minh chứng 03-atlas-hdfs"></a><figcaption>03-atlas-hdfs</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/04-git-ignore.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/04-git-ignore.png" alt="Minh chứng 04-git-ignore"></a><figcaption>04-git-ignore</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/05-create-201.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/05-create-201.png" alt="Minh chứng 05-create-201"></a><figcaption>05-create-201</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/06-list-200.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/06-list-200.png" alt="Minh chứng 06-list-200"></a><figcaption>06-list-200</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/07-read-200.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/07-read-200.png" alt="Minh chứng 07-read-200"></a><figcaption>07-read-200</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/08-update-200.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/08-update-200.png" alt="Minh chứng 08-update-200"></a><figcaption>08-update-200</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/09-upload-url.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/09-upload-url.png" alt="Minh chứng 09-upload-url"></a><figcaption>09-upload-url</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/10-public-file.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/10-public-file.png" alt="Minh chứng 10-public-file"></a><figcaption>10-public-file</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/11-delete-204.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/11-delete-204.png" alt="Minh chứng 11-delete-204"></a><figcaption>11-delete-204</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/12-not-found-404.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/12-not-found-404.png" alt="Minh chứng 12-not-found-404"></a><figcaption>12-not-found-404</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/13-invalid-400.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/13-invalid-400.png" alt="Minh chứng 13-invalid-400"></a><figcaption>13-invalid-400</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/14-atlas-overview.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/14-atlas-overview.png" alt="Minh chứng 14-atlas-overview"></a><figcaption>14-atlas-overview</figcaption></figure>
+<figure><a href="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/15-supabase-overview.png"><img loading="lazy" src="https://raw.githubusercontent.com/tinhuynh7/notes-api-2324802010372/0503c9ff3802907c7dd81edcb51dd175bede547a/docs/minh-chung/15-supabase-overview.png" alt="Minh chứng 15-supabase-overview"></a><figcaption>15-supabase-overview</figcaption></figure>
+</section>
+<section id="lab04" aria-labelledby="lab04-title">
+  <h2 id="lab04-title">Lab 4 — Bảo mật ứng dụng đám mây</h2>
+  <p><a href="https://github.com/tinhuynh7/notes-api-2324802010372/commit/6fbb1481d9ff2d58675afc3f305e5b3d6a02c1d0">Commit Bai 4</a></p>
+  <h3>A — Quản lý bí mật</h3>
+  <p>Codespace nhận đủ bốn biến môi trường. Rà soát lịch sử Git không phát hiện thông tin xác thực theo các mẫu đã kiểm tra. Push protection và Dependabot alerts đã bật.</p>
+  <h3>B — Xác thực và phân quyền</h3>
+  <p>Mật khẩu được băm bằng bcrypt. JWT có hiệu lực một giờ. API lọc ghi chú theo chủ sở hữu. Kiểm thử xác nhận thiếu token nhận 401, token hợp lệ nhận 200, người B xem ghi chú của A nhận 404 và yêu cầu thứ 21 trong 15 phút tới /auth nhận 429.</p>
+  <h3>C — Quét lỗ hổng</h3>
+  <p>npm audit --omit=dev báo 0 lỗ hổng và Dependabot báo 0 cảnh báo đang mở tại thời điểm kiểm tra.</p>
+  <table><caption>Kết quả Trivy và kích thước image đã build</caption><thead><tr><th scope="col">Image nền</th><th scope="col">Kích thước</th><th scope="col">HIGH</th><th scope="col">CRITICAL</th></tr></thead><tbody><tr><td>node:22-alpine</td><td>289,02 MB</td><td>10</td><td>0</td></tr><tr><td>node:22</td><td>1.673,87 MB</td><td>479</td><td>20</td></tr></tbody></table>
+  <h3>D — Phân tích rủi ro</h3>
+  <table><thead><tr><th scope="col">Quyết định</th><th scope="col">Rủi ro</th><th scope="col">Biện pháp bù trừ</th><th scope="col">Phương án tốt hơn</th></tr></thead><tbody><tr><td>Atlas mở 0.0.0.0/0</td><td>Mọi nguồn IPv4 có thể thử kết nối. Nếu thông tin đăng nhập bị lộ, dữ liệu notes có thể bị đọc, sửa hoặc xóa.</td><td>Quyền readWrite giới hạn trên notes, mật khẩu ngẫu nhiên, TLS và bí mật lưu ngoài mã nguồn.</td><td>Cho phép IP đầu ra tĩnh của API hoặc dùng Private Endpoint/VPC peering nếu hạ tầng hỗ trợ.</td></tr></tbody></table>
+  <h3>Câu hỏi phản biện</h3>
+  <ol>
+    <li>JWT bị lộ có thể được dùng đến khi hết hạn. Danh sách thu hồi theo jti trong Redis cho phép chặn từng token, đổi lại cần vận hành Redis và tra cứu mỗi yêu cầu.</li>
+    <li>Alpine thường có ít gói mặc định hơn. Cần đánh giá khả năng ứng dụng tiếp xúc với phần bị ảnh hưởng, bản vá và phạm vi của công cụ quét.</li>
+    <li>Atlas và Supabase vận hành và vá hạ tầng. Nhóm phát triển chịu trách nhiệm về cấu hình mạng, quyền dữ liệu, bí mật, xác thực và cập nhật thư viện.</li>
+  </ol>
 </section>
 </main>
 </body>
