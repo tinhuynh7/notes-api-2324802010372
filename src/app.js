@@ -2,8 +2,17 @@ const express = require('express');
 const os = require('node:os');
 const notesRouter = require('./routes/notes');
 
+const helmet = require('helmet');
+const { rateLimit } = require('express-rate-limit');
+const mongoose = require('mongoose');
+const authRouter = require('./routes/auth');
+
+mongoose.set('sanitizeFilter', true);
 const app = express();
-app.use(express.json());
+if (process.env.CODESPACES === 'true' || process.env.VERCEL === '1') app.set('trust proxy', 1);
+app.use(helmet());
+app.use(express.json({ limit: '100kb' }));
+app.use('/auth', rateLimit({ windowMs: 15 * 60 * 1000, limit: 20 }), authRouter);
 
 app.get('/', (req, res) => {
   res.json({
